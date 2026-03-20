@@ -11,6 +11,7 @@ import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseList from "@/components/ExpenseList";
 import FilterBar from "@/components/FilterBar";
 import SeedButton from "@/components/SeedButton";
+import ExportModal from "@/components/ExportModal";
 
 type Tab = "dashboard" | "expenses" | "add";
 
@@ -22,10 +23,11 @@ const DEFAULT_FILTERS: FilterState = {
 };
 
 export default function Home() {
-  const { expenses, isLoaded, addExpense, updateExpense, deleteExpense, exportCSV, seedExpenses } =
+  const { expenses, isLoaded, addExpense, updateExpense, deleteExpense, seedExpenses } =
     useExpenses();
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const filteredExpenses = useMemo(
     () => applyFilters(expenses, filters),
@@ -60,7 +62,17 @@ export default function Home() {
                   Overview of your spending
                 </p>
               </div>
-              <SeedButton onSeed={seedExpenses} hasData={expenses.length > 0} />
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setExportOpen(true)}
+                  disabled={expenses.length === 0}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Download size={15} />
+                  Export Data
+                </button>
+                <SeedButton onSeed={seedExpenses} hasData={expenses.length > 0} />
+              </div>
             </div>
 
             <SummaryCards expenses={expenses} />
@@ -105,12 +117,12 @@ export default function Home() {
                 </p>
               </div>
               <button
-                onClick={() => exportCSV(filteredExpenses)}
-                disabled={filteredExpenses.length === 0}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                onClick={() => setExportOpen(true)}
+                disabled={expenses.length === 0}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 <Download size={15} />
-                Export CSV
+                Export Data
               </button>
             </div>
 
@@ -164,6 +176,12 @@ export default function Home() {
           </>
         )}
       </main>
+
+      <ExportModal
+        isOpen={exportOpen}
+        onClose={() => setExportOpen(false)}
+        expenses={expenses}
+      />
     </>
   );
 }
