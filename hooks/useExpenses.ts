@@ -91,11 +91,11 @@ export function useExpenses() {
   }, []);
 
   const exportCSV = useCallback((filtered: Expense[]): void => {
-    const header = "Date,Amount,Category,Description\n";
+    const header = "Date,Category,Amount,Description\n";
     const rows = filtered
       .map(
         (e) =>
-          `${e.date},${e.amount.toFixed(2)},${e.category},"${e.description.replace(/"/g, '""')}"`
+          `${e.date},${e.category},${e.amount.toFixed(2)},"${e.description.replace(/"/g, '""')}"`
       )
       .join("\n");
     const blob = new Blob([header + rows], { type: "text/csv" });

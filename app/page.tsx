@@ -60,7 +60,17 @@ export default function Home() {
                   Overview of your spending
                 </p>
               </div>
-              <SeedButton onSeed={seedExpenses} hasData={expenses.length > 0} />
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => exportCSV(expenses)}
+                  disabled={expenses.length === 0}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Download size={15} />
+                  Export Data
+                </button>
+                <SeedButton onSeed={seedExpenses} hasData={expenses.length > 0} />
+              </div>
             </div>
 
             <SummaryCards expenses={expenses} />
