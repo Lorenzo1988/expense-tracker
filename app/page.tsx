@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Download } from "lucide-react";
+import { Cloud } from "lucide-react";
 import { useExpenses, FilterState } from "@/hooks/useExpenses";
 import { applyFilters } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
@@ -11,6 +11,7 @@ import ExpenseForm from "@/components/ExpenseForm";
 import ExpenseList from "@/components/ExpenseList";
 import FilterBar from "@/components/FilterBar";
 import SeedButton from "@/components/SeedButton";
+import ExportHub from "@/components/ExportHub";
 
 type Tab = "dashboard" | "expenses" | "add";
 
@@ -22,10 +23,11 @@ const DEFAULT_FILTERS: FilterState = {
 };
 
 export default function Home() {
-  const { expenses, isLoaded, addExpense, updateExpense, deleteExpense, exportCSV, seedExpenses } =
+  const { expenses, isLoaded, addExpense, updateExpense, deleteExpense, seedExpenses } =
     useExpenses();
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [hubOpen, setHubOpen] = useState(false);
 
   const filteredExpenses = useMemo(
     () => applyFilters(expenses, filters),
@@ -60,7 +62,17 @@ export default function Home() {
                   Overview of your spending
                 </p>
               </div>
-              <SeedButton onSeed={seedExpenses} hasData={expenses.length > 0} />
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setHubOpen(true)}
+                  disabled={expenses.length === 0}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  <Cloud size={15} />
+                  Export Hub
+                </button>
+                <SeedButton onSeed={seedExpenses} hasData={expenses.length > 0} />
+              </div>
             </div>
 
             <SummaryCards expenses={expenses} />
@@ -105,12 +117,12 @@ export default function Home() {
                 </p>
               </div>
               <button
-                onClick={() => exportCSV(filteredExpenses)}
-                disabled={filteredExpenses.length === 0}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                onClick={() => setHubOpen(true)}
+                disabled={expenses.length === 0}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 rounded-lg shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
-                <Download size={15} />
-                Export CSV
+                <Cloud size={15} />
+                Export Hub
               </button>
             </div>
 
@@ -164,6 +176,11 @@ export default function Home() {
           </>
         )}
       </main>
+      <ExportHub
+        isOpen={hubOpen}
+        onClose={() => setHubOpen(false)}
+        expenses={expenses}
+      />
     </>
   );
 }
